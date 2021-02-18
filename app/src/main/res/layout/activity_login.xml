@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".LoginActivity">
+
+    <EditText
+        android:id="@+id/editText_Register"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="64dp"
+        android:layout_marginEnd="64dp"
+        android:ems="10"
+        android:inputType="textPassword"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Password"
+        app:layout_constraintBottom_toTopOf="@+id/editText_Register"
+        app:layout_constraintStart_toStartOf="@+id/editText_Register" />
+
+    <EditText
+        android:id="@+id/editText_Login"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        app:layout_constraintBottom_toTopOf="@+id/textView"
+        app:layout_constraintEnd_toEndOf="@+id/editText_Register"
+        app:layout_constraintStart_toStartOf="@+id/editText_Register" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Login"
+        app:layout_constraintBottom_toTopOf="@+id/editText_Login"
+        app:layout_constraintStart_toStartOf="@+id/editText_Login" />
+
+    <CheckBox
+        android:id="@+id/checkBox_saveData"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Remeber me"
+        app:layout_constraintStart_toStartOf="@+id/editText_Register"
+        app:layout_constraintTop_toBottomOf="@+id/editText_Register" />
+
+    <Button
+        android:id="@+id/button_Enter"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Enter"
+        app:layout_constraintEnd_toEndOf="@+id/editText_Register"
+        app:layout_constraintStart_toStartOf="@+id/editText_Register"
+        app:layout_constraintTop_toBottomOf="@+id/checkBox_saveData" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
