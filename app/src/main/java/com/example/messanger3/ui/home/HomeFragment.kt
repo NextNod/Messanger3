@@ -28,9 +28,6 @@ class HomeFragment : Fragment() {
             ViewModelProvider(this).get(HomeViewModel::class.java)
         val root = inflater.inflate(R.layout.fragment_home, container, false)
         val textView: TextView = root.findViewById(R.id.text_home)
-        homeViewModel.text.observe(viewLifecycleOwner, Observer {
-            textView.text = it
-        })
 
         CoroutineScope(IO).launch {
             val soc = Socket("nextrun.mykeenetic.by", 801)
@@ -45,6 +42,11 @@ class HomeFragment : Fragment() {
             writer.write(key.toByteArray())
             Thread.sleep(50)
             reader.read(data)
+
+            if(String(data).startsWith("{EMP}"))
+                textView.text = "Sorry, but you haven`t got friends((("
+            else
+                textView.text = String(data)
         }
 
         return root
