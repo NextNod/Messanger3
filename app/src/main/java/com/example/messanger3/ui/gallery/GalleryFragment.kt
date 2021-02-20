@@ -29,10 +29,9 @@ class GalleryFragment : Fragment() {
 
         val search = root.findViewById<EditText>(R.id.editTextSearch)
         val button = root.findViewById<Button>(R.id.buttonSearch)
-        var haveRequest = false
-        var arrayAdapter : ArrayAdapter<*>? = null
+        var sourse :Array<String>? = null
 
-        CoroutineScope(IO).launch {
+        val thread = Thread {
             val soc = Socket("nextrun.mykeenetic.by", 801)
             val writer = soc.getOutputStream()
             val reader = soc.getInputStream()
@@ -45,15 +44,18 @@ class GalleryFragment : Fragment() {
             Thread.sleep(50)
             reader.read(data)
 
-            if(String(data).startsWith("{EMP}"))
+            if (String(data).startsWith("{EMP}"))
                 textView.text = "No requests!"
             else {
                 data = clearData(data)
-                val sourse = slice(String(data).removePrefix("{INF}"), '\n')
-                arrayAdapter = ArrayAdapter(root.context, R.layout.fragment_gallery, sourse)
-                haveRequest = true
+                sourse = slice(String(data).removePrefix("{INF}"), '\n')
             }
         }
+        thread.start()
+        thread.join()
+
+        if(sourse != null)
+            root.findViewById<ListView>(R.id.requestList).adapter = ArrayAdapter(root.context, R.layout.fragment_gallery, sourse!!)
 
         button.setOnClickListener { view ->
             CoroutineScope(IO).launch {
@@ -81,14 +83,12 @@ class GalleryFragment : Fragment() {
             }
         }
 
-        if(haveRequest) root.findViewById<ListView>(R.id.requestList).adapter = arrayAdapter
-
         return root
     }
 
     private fun clearData(data :ByteArray) :ByteArray
     {
-        var result :ByteArray = ByteArray(0)
+        var result = ByteArray(0)
         data.forEach {
             byte: Byte ->
             if(byte != 0.toByte())
@@ -100,7 +100,7 @@ class GalleryFragment : Fragment() {
 
     private fun slice(string :String, suffix :Char) :Array<String> {
         var result :Array<String> = arrayOf()
-        var temp :String = ""
+        var temp = ""
         for(i in string) {
             if(i == suffix) {
                 result += temp
