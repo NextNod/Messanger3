@@ -71,7 +71,7 @@ class RegisterActivity : AppCompatActivity() {
                 Thread.sleep(100)
                 reader.read(data)
                 if (String(data).startsWith("{ER1}"))
-                    Snackbar.make(findViewById<View>(R.id.button_Enter), "Wrong Password", Snackbar.LENGTH_LONG).show()
+                    Snackbar.make(findViewById<View>(R.id.button_register_enter), "Wrong Password", Snackbar.LENGTH_LONG).show()
                 else {
                     val intent = Intent(applicationContext, HomeActivity::class.java)
                     Data.key = String(data).removeRange(9, 10)
@@ -95,7 +95,11 @@ class RegisterActivity : AppCompatActivity() {
 
     private fun genSalt() : String
     {
-        return Random.nextBytes(16).toString()
+        var salt = ""
+        for(i in 1..16) {
+            salt += Random.nextInt(33, 126).toChar()
+        }
+        return salt
     }
 
     private fun hashString(input: String): String {

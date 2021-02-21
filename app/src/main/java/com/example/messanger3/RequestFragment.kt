@@ -9,6 +9,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ListView
+import android.widget.TextView
+import androidx.navigation.fragment.findNavController
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
@@ -34,8 +37,9 @@ class RequestFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val root = inflater.inflate(R.layout.fragment_request, container, false)
-
+        val stateText = root.findViewById<TextView>(R.id.state_textView)
         var sourse :Array<String>? = null
+
         val thread = Thread {
             val soc = Socket("nextrun.mykeenetic.by", 801)
             val writer = soc.getOutputStream()
@@ -52,7 +56,9 @@ class RequestFragment : Fragment() {
             if (!String(data).startsWith("{EMP}")) {
                 data = clearData(data)
                 sourse = slice(String(data).removePrefix("{INF}"), '\n')
-
+            }
+            else {
+                stateText.text = "Sorry no requests(("
             }
         }
         thread.start()
@@ -61,17 +67,48 @@ class RequestFragment : Fragment() {
         val listView = root.findViewById<ListView>(R.id.requestList)
         val dialog = AlertDialog.Builder(root.context)
 
-        if(sourse != null)
+        if(sourse != null) {
+            stateText.visibility = View.INVISIBLE
+            listView.visibility = View.VISIBLE
+            root.findViewById<TextView>(R.id.textView6).visibility = View.VISIBLE
             listView.adapter = ArrayAdapter<String>(root.context, android.R.layout.simple_list_item_1, sourse!!)
+        }
 
         listView.setOnItemClickListener { parent, view, position, id ->
-            dialog.setTitle(sourse?.get(position))
-            dialog.setMessage("Do you want add to friends " + sourse?.get(position) + "?")
+            val user = sourse?.get(position)
+            dialog.setTitle(user)
+            dialog.setMessage("Do you want add to friends $user?")
             dialog.setPositiveButton("Yes") { dialog, which ->  
                 CoroutineScope(IO).launch {
-                    // Дописать !!!
+                    if (user != null) {
+                        val soc = Socket("nextrun.mykeenetic.by", 801)
+                        val writer = soc.getOutputStream()
+                        val reader = soc.getInputStream()
+                        var data = ByteArray(255)
+
+                        writer.write("accept_request".toByteArray())
+                        Thread.sleep(50)
+                        reader.read(data)
+
+                        writer.write(Data.key.toByteArray())
+                        Thread.sleep(50)
+                        reader.read(data)
+
+
+                        writer.write(user.toByteArray())
+                        Thread.sleep(50)
+                        reader.read(data)
+
+                        if(String(data).startsWith("{ER1}"))
+                            Snackbar.make(root, String(data).removePrefix("{ER1}"), Snackbar.LENGTH_LONG).show()
+                        else {
+                            Snackbar.make(root, String(data).removePrefix("{INF}"), Snackbar.LENGTH_LONG).show()
+                        }
+                        dialog.cancel()
+                    }
                 }
             }
+            dialog.show()
         }
 
         return root
@@ -95,6 +132,7 @@ class RequestFragment : Fragment() {
         for(i in string) {
             if(i == suffix) {
                 result += temp
+                temp = ""
                 continue
             }
             temp += i
@@ -104,7 +142,6 @@ class RequestFragment : Fragment() {
     }
 
     companion object {
-        // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
             RequestFragment().apply {

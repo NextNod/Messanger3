@@ -41,7 +41,7 @@ class LoginActivity : AppCompatActivity() {
                 else
                 {
                     val intent = Intent(applicationContext, HomeActivity::class.java)
-                    Data.key = result.removeRange(9, 10)
+                    Data.key = result.substring(0, 9)
                     startActivity(intent)
                 }
             }
