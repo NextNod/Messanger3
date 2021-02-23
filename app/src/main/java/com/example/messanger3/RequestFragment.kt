@@ -1,16 +1,15 @@
 package com.example.messanger3
 
+import Data
 import android.app.AlertDialog
-import android.app.Dialog
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import android.widget.TextView
-import androidx.navigation.fragment.findNavController
+import androidx.fragment.app.Fragment
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
@@ -84,7 +83,7 @@ class RequestFragment : Fragment() {
                         val soc = Socket("nextrun.mykeenetic.by", 801)
                         val writer = soc.getOutputStream()
                         val reader = soc.getInputStream()
-                        var data = ByteArray(255)
+                        val data = ByteArray(255)
 
                         writer.write("accept_request".toByteArray())
                         Thread.sleep(50)
@@ -139,16 +138,5 @@ class RequestFragment : Fragment() {
         }
 
         return result
-    }
-
-    companion object {
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            RequestFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
     }
 }
