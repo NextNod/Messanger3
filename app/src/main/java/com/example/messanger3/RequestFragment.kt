@@ -10,25 +10,15 @@ import android.widget.ArrayAdapter
 import android.widget.ListView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import java.net.Socket
-
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
 class RequestFragment : Fragment() {
-    private var param1: String? = null
-    private var param2: String? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
     }
 
     override fun onCreateView(
@@ -37,7 +27,7 @@ class RequestFragment : Fragment() {
     ): View? {
         val root = inflater.inflate(R.layout.fragment_request, container, false)
         val stateText = root.findViewById<TextView>(R.id.state_textView)
-        var sourse :Array<String>? = null
+        var sourse :Array<String>? = null;
 
         val thread = Thread {
             val soc = Socket("nextrun.mykeenetic.by", 801)
@@ -63,6 +53,20 @@ class RequestFragment : Fragment() {
         thread.start()
         thread.join()
 
+        val layout = SwipeRefreshLayout(root.context)
+        layout.setOnRefreshListener {
+            thread.start()
+            thread.join()
+            layout.isRefreshing = false
+        }
+
+        layout.setColorSchemeResources(
+            android.R.color.holo_blue_bright,
+            android.R.color.holo_green_light,
+            android.R.color.holo_orange_light,
+            android.R.color.holo_red_light
+        )
+
         val listView = root.findViewById<ListView>(R.id.requestList)
         val dialog = AlertDialog.Builder(root.context)
 
@@ -70,7 +74,7 @@ class RequestFragment : Fragment() {
             stateText.visibility = View.INVISIBLE
             listView.visibility = View.VISIBLE
             root.findViewById<TextView>(R.id.textView6).visibility = View.VISIBLE
-            listView.adapter = ArrayAdapter<String>(root.context, android.R.layout.simple_list_item_1, sourse!!)
+            listView.adapter = ArrayAdapter(root.context, android.R.layout.simple_list_item_1, sourse!!)
         }
 
         listView.setOnItemClickListener { parent, view, position, id ->
@@ -102,6 +106,44 @@ class RequestFragment : Fragment() {
                             Snackbar.make(root, String(data).removePrefix("{ER1}"), Snackbar.LENGTH_LONG).show()
                         else {
                             Snackbar.make(root, String(data).removePrefix("{INF}"), Snackbar.LENGTH_LONG).show()
+                        }
+                        dialog.cancel()
+                    }
+                }
+            }
+            dialog.setNegativeButton("No") { dialog, which ->
+                CoroutineScope(IO).launch {
+                    if (user != null) {
+                        val soc = Socket("nextrun.mykeenetic.by", 801)
+                        val writer = soc.getOutputStream()
+                        val reader = soc.getInputStream()
+                        val data = ByteArray(255)
+
+                        writer.write("decline_incoming".toByteArray())
+                        Thread.sleep(50)
+                        reader.read(data)
+
+                        writer.write(Data.key.toByteArray())
+                        Thread.sleep(50)
+                        reader.read(data)
+
+
+                        writer.write(user.toByteArray())
+                        Thread.sleep(50)
+                        reader.read(data)
+
+                        if (String(data).startsWith("{ER1}"))
+                            Snackbar.make(
+                                root,
+                                String(data).removePrefix("{ER1}"),
+                                Snackbar.LENGTH_LONG
+                            ).show()
+                        else {
+                            Snackbar.make(
+                                root,
+                                String(data).removePrefix("{INF}"),
+                                Snackbar.LENGTH_LONG
+                            ).show()
                         }
                         dialog.cancel()
                     }
