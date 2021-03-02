@@ -36,17 +36,21 @@ class RegisterActivity : AppCompatActivity() {
             val salt = genSalt()
 
             writer.write("reg".toByteArray())
-            Thread.sleep(100)
-            reader.read()
+            Thread.sleep(50)
+            reader.read(data)
+
             writer.write(login.toByteArray())
-            Thread.sleep(100)
-            reader.read()
+            Thread.sleep(50)
+            reader.read(data)
+
             writer.write(hashString(pass + salt).toByteArray())
-            Thread.sleep(100)
-            reader.read()
+            Thread.sleep(50)
+            reader.read(data)
+
             writer.write(salt.toByteArray())
-            Thread.sleep(100)
-            reader.read()
+            Thread.sleep(50)
+            reader.read(data)
+
             Thread.sleep(100)
             writer.write(email.toByteArray())
             reader.read(data)
@@ -54,8 +58,9 @@ class RegisterActivity : AppCompatActivity() {
             writer.close()
             reader.close()
             soc.close()
-            if (String(data).startsWith("{ERR1}"))
-                Snackbar.make(findViewById<View>(R.id.button_register_enter), String(data).removeSuffix("{ER1}"), Snackbar.LENGTH_LONG)
+
+            if (!String(data).startsWith("{200}"))
+                SnakBar.make(findViewById(R.id.button_register_enter), String(data), Snackbar.LENGTH_LONG)
             else {
                 val soc = Socket("nextrun.mykeenetic.by", 801)
                 val writer = soc.getOutputStream()
@@ -63,19 +68,22 @@ class RegisterActivity : AppCompatActivity() {
                 data = ByteArray(255)
 
                 writer.write("log".toByteArray())
-                reader.read(data, 0, 255)
+                reader.read(data)
+
                 writer.write(login.toByteArray())
-                reader.read(data, 0, 255)
+                reader.read(data)
+
                 data = clearData(data)
+
                 writer.write(hashString(pass + String(data)).toByteArray())
                 Thread.sleep(100)
                 reader.read(data)
-                if (String(data).startsWith("{ER1}"))
-                    Snackbar.make(findViewById<View>(R.id.button_register_enter), "Wrong Password", Snackbar.LENGTH_LONG).show()
+
+                if (String(data).startsWith("{"))
+                    SnakBar.make(findViewById(R.id.button_register_enter), String(data), Snackbar.LENGTH_LONG)
                 else {
-                    val intent = Intent(applicationContext, HomeActivity::class.java)
                     Data.key = String(data).removeRange(9, 10)
-                    startActivity(intent)
+                    startActivity(Intent(applicationContext, HomeActivity::class.java))
                 }
             }
         }

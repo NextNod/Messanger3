@@ -12,6 +12,7 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import java.net.Socket
 import Data
+import SnakBar
 import java.security.MessageDigest
 
 class LoginActivity : AppCompatActivity() {
@@ -27,22 +28,27 @@ class LoginActivity : AppCompatActivity() {
                 var salt :ByteArray = ByteArray(255)
 
                 writer.write("log".toByteArray())
-                reader.read(salt, 0, 255)
-                writer.write(findViewById<EditText>(R.id.editText_Login).text.toString().toByteArray())
-                reader.read(salt, 0, 255)
-                salt = clearData(salt)
-                val example = String(salt)
-                writer.write(hashString(findViewById<EditText>(R.id.editText_Register).text.toString() + example).toByteArray())
-                Thread.sleep(100)
                 reader.read(salt)
+
+                writer.write(findViewById<EditText>(R.id.editText_Login).text.toString().toByteArray())
+                reader.read(salt)
+                salt = clearData(salt)
+
+                val example = String(salt)
+
+                writer.write(hashString(findViewById<EditText>(R.id.editText_Register).text.toString() + example).toByteArray())
+                Thread.sleep(50)
+                reader.read(salt)
+
                 val result = String(salt)
-                if(result.startsWith("{ER1}"))
-                    Snackbar.make(findViewById<View>(R.id.button_Enter), "Wrong Password", Snackbar.LENGTH_LONG).show()
+                if(result.startsWith("{"))
+                    SnakBar.make(findViewById(R.id.button_Enter), result, Snackbar.LENGTH_LONG)
                 else
                 {
                     val intent = Intent(applicationContext, HomeActivity::class.java)
                     Data.key = result.substring(0, 9)
                     startActivity(intent)
+                    finish()
                 }
             }
         }

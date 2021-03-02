@@ -1,9 +1,11 @@
 package com.example.messanger3.ui.gallery
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -28,8 +30,10 @@ class GalleryFragment : Fragment() {
 
         val search = root.findViewById<EditText>(R.id.editTextSearch)
         val button = root.findViewById<Button>(R.id.buttonSearch)
+        val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 
         button.setOnClickListener { view ->
+            imm.hideSoftInputFromWindow(root.windowToken, 0)
             CoroutineScope(IO).launch {
                 val soc = Socket("nextrun.mykeenetic.by", 801)
                 val writer = soc.getOutputStream()
@@ -47,11 +51,7 @@ class GalleryFragment : Fragment() {
                 reader.read(data)
 
                 val result = String(data)
-                if (result.startsWith("{ER1}"))
-                    Snackbar.make(view, result.removePrefix("{ER1}"), Snackbar.LENGTH_LONG).show()
-                else {
-                    Snackbar.make(view, result.removePrefix("{INF}"), Snackbar.LENGTH_LONG).show()
-                }
+                SnakBar.make(view, result, Snackbar.LENGTH_LONG)
             }
         }
 

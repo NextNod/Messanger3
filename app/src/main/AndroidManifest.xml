@@ -11,12 +11,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Messanger3">
+        <activity android:name=".DialogActivity"></activity>
         <activity
             android:name=".HomeActivity"
             android:label="@string/title_activity_home"
-            android:theme="@style/Theme.Messanger3.NoActionBar"></activity>
+            android:theme="@style/Theme.Messanger3.NoActionBar" />
         <activity
-            android:name="MainActivity2"
+            android:name=".MainActivity2"
             android:label="@string/title_activity_main2" />
         <activity android:name=".RegisterActivity" />
         <activity android:name=".LoginActivity" />

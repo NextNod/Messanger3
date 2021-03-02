@@ -42,9 +42,9 @@ class RequestFragment : Fragment() {
             Thread.sleep(50)
             reader.read(data)
 
-            if (!String(data).startsWith("{EMP}")) {
+            if (String(data).startsWith("{800}")) {
                 data = clearData(data)
-                sourse = slice(String(data).removePrefix("{INF}"), '\n')
+                sourse = slice(String(data).removePrefix("{800}"), '\n')
             }
             else {
                 stateText.text = "Sorry no requests(("
@@ -55,9 +55,28 @@ class RequestFragment : Fragment() {
 
         val layout = SwipeRefreshLayout(root.context)
         layout.setOnRefreshListener {
-            thread.start()
-            thread.join()
-            layout.isRefreshing = false
+            CoroutineScope(IO).launch {
+                val soc = Socket("nextrun.mykeenetic.by", 801)
+                val writer = soc.getOutputStream()
+                val reader = soc.getInputStream()
+                var data = ByteArray(255)
+
+                writer.write("check_requests".toByteArray())
+                Thread.sleep(50)
+                reader.read(data)
+                writer.write(Data.key.toByteArray())
+                Thread.sleep(50)
+                reader.read(data)
+
+                if (String(data).startsWith("{800}")) {
+                    data = clearData(data)
+                    sourse = slice(String(data).removePrefix("{800}"), '\n')
+                }
+                else {
+                    stateText.text = "Sorry no requests(("
+                }
+                layout.isRefreshing = false
+            }
         }
 
         layout.setColorSchemeResources(

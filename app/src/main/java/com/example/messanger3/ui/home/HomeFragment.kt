@@ -25,7 +25,6 @@ class HomeFragment : Fragment() {
         homeViewModel =
             ViewModelProvider(this).get(HomeViewModel::class.java)
         val root = inflater.inflate(R.layout.fragment_home, container, false)
-        val textView: TextView = root.findViewById(R.id.text_home)
         var text = ""
 
         val thread = Thread {
@@ -42,17 +41,17 @@ class HomeFragment : Fragment() {
             Thread.sleep(50)
             reader.read(data)
 
-            text = if(String(data).startsWith("{EMP}"))
+            text = if(!String(data).startsWith("{300}"))
                 "Sorry, but you haven`t got friends((("
             else
-                String(data)
+                String(data).removeRange(0, 5)
         }
 
         thread.start()
         thread.join()
 
         val listView = root.findViewById<ListView>(R.id.listFriends)
-        listView.adapter = ArrayAdapter<String>(root.context, android.R.layout.simple_list_item_1, slice(text.removePrefix("{INF}"), '\n'))
+        listView.adapter = ArrayAdapter(root.context, android.R.layout.simple_list_item_1, slice(text.removePrefix("{INF}"), '\n'))
 
         return root
     }
