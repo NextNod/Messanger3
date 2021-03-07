@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import java.net.Socket
 import Data
 import SnakBar
+import android.widget.CheckBox
 import java.security.MessageDigest
 
 class LoginActivity : AppCompatActivity() {
@@ -46,6 +47,15 @@ class LoginActivity : AppCompatActivity() {
                 else
                 {
                     val intent = Intent(applicationContext, HomeActivity::class.java)
+
+                    if(findViewById<CheckBox>(R.id.checkBox_saveData).isChecked) {
+                        val db = DataBase(applicationContext, null)
+                        if(!db.isEmpty())
+                            db.deleteKey()
+                        db.addKey(result.substring(0, 9))
+                        db.close()
+                    }
+
                     Data.key = result.substring(0, 9)
                     startActivity(intent)
                     finish()

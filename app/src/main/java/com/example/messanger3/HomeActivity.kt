@@ -1,7 +1,10 @@
 package com.example.messanger3
 
+import android.content.Intent
 import android.os.Bundle
+import android.provider.ContactsContract
 import android.view.Menu
+import android.view.MenuItem
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.navigation.NavigationView
@@ -43,6 +46,20 @@ class HomeActivity : AppCompatActivity() {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.home, menu)
         return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val id = item.itemId
+        if(id == R.id.action_exit) {
+            val db = DataBase(this, null)
+            db.deleteKey()
+            Data.key = ""
+            startActivity(Intent(applicationContext, MainActivity::class.java))
+            finish()
+            return true
+        }
+        else
+            return super.onOptionsItemSelected(item)
     }
 
     override fun onSupportNavigateUp(): Boolean {
