@@ -23,6 +23,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var notificationManager: NotificationManager
     lateinit var notificationChannel: NotificationChannel
     lateinit var builder: Notification.Builder
+    
     private val channelId = "i.apps.notifications"
     private val description = "Test notification"
 

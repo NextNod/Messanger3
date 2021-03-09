@@ -50,16 +50,15 @@ class HomeActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
-        if(id == R.id.action_exit) {
+        return if(id == R.id.action_exit) {
             val db = DataBase(this, null)
             db.deleteKey()
             Data.key = ""
             startActivity(Intent(applicationContext, MainActivity::class.java))
             finish()
-            return true
-        }
-        else
-            return super.onOptionsItemSelected(item)
+            true
+        } else
+            super.onOptionsItemSelected(item)
     }
 
     override fun onSupportNavigateUp(): Boolean {

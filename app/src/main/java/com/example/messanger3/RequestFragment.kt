@@ -96,11 +96,11 @@ class RequestFragment : Fragment() {
             listView.adapter = ArrayAdapter(root.context, android.R.layout.simple_list_item_1, sourse!!)
         }
 
-        listView.setOnItemClickListener { parent, view, position, id ->
+        listView.setOnItemClickListener { _, _, position, _ ->
             val user = sourse?.get(position)
             dialog.setTitle(user)
             dialog.setMessage("Do you want add to friends $user?")
-            dialog.setPositiveButton("Yes") { dialog, which ->  
+            dialog.setPositiveButton("Yes") { dialog, _ ->
                 CoroutineScope(IO).launch {
                     if (user != null) {
                         val soc = Socket("nextrun.mykeenetic.by", 801)
@@ -130,7 +130,7 @@ class RequestFragment : Fragment() {
                     }
                 }
             }
-            dialog.setNegativeButton("No") { dialog, which ->
+            dialog.setNegativeButton("No") { dialog, _ ->
                 CoroutineScope(IO).launch {
                     if (user != null) {
                         val soc = Socket("nextrun.mykeenetic.by", 801)

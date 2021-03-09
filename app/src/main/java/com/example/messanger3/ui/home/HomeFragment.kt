@@ -1,15 +1,16 @@
 package com.example.messanger3.ui.home
 
 import Data
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ListView
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.example.messanger3.DialogActivity
 import com.example.messanger3.R
 import java.net.Socket
 
@@ -52,6 +53,11 @@ class HomeFragment : Fragment() {
 
         val listView = root.findViewById<ListView>(R.id.listFriends)
         listView.adapter = ArrayAdapter(root.context, android.R.layout.simple_list_item_1, slice(text.removePrefix("{INF}"), '\n'))
+
+        listView.setOnItemClickListener { parent, view, position, id ->
+            Data.dialog = listView.adapter.getItem(position) as String
+            startActivity(Intent(root.context, DialogActivity::class.java))
+        }
 
         return root
     }
