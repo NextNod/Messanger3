@@ -26,23 +26,23 @@ class LoginActivity : AppCompatActivity() {
                 val soc = Socket("nextrun.mykeenetic.by", 801)
                 val writer = soc.getOutputStream()
                 val reader = soc.getInputStream()
-                var salt :ByteArray = ByteArray(255)
+                var salt = ByteArray(255)
 
-                writer.write("log".toByteArray())
+                writer.write("[LOG]".toByteArray())
                 reader.read(salt)
 
                 writer.write(findViewById<EditText>(R.id.editText_Login).text.toString().toByteArray())
                 reader.read(salt)
                 salt = clearData(salt)
 
-                val example = String(salt)
+                val example = String(salt).removePrefix("{101}")
 
                 writer.write(hashString(findViewById<EditText>(R.id.editText_Register).text.toString() + example).toByteArray())
                 Thread.sleep(50)
                 reader.read(salt)
 
                 val result = String(salt)
-                if(result.startsWith("{"))
+                if(!result.startsWith("{101}"))
                     SnakBar.make(findViewById(R.id.button_Enter), result, Snackbar.LENGTH_LONG)
                 else
                 {
@@ -52,11 +52,11 @@ class LoginActivity : AppCompatActivity() {
                         val db = DataBase(applicationContext, null)
                         if(!db.isEmpty())
                             db.deleteKey()
-                        db.addKey(result.substring(0, 9))
+                        db.addKey(result.removePrefix("{101}").substring(0, 9))
                         db.close()
                     }
 
-                    Data.key = result.substring(0, 9)
+                    Data.key = result.removePrefix("{101}").substring(0, 9)
                     startActivity(intent)
                     finish()
                 }

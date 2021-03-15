@@ -35,14 +35,14 @@ class HomeFragment : Fragment() {
             val key = Data.key
             val data = ByteArray(255)
 
-            writer.write("show_friends".toByteArray())
+            writer.write("[GET_FRIEND_LIST]".toByteArray())
             Thread.sleep(50)
             reader.read(data)
             writer.write(key.toByteArray())
             Thread.sleep(50)
             reader.read(data)
 
-            text = if(!String(data).startsWith("{300}"))
+            text = if(!String(data).startsWith("{101}"))
                 "Sorry, but you haven`t got friends((("
             else
                 String(data).removeRange(0, 5)
@@ -52,7 +52,7 @@ class HomeFragment : Fragment() {
         thread.join()
 
         val listView = root.findViewById<ListView>(R.id.listFriends)
-        listView.adapter = ArrayAdapter(root.context, android.R.layout.simple_list_item_1, slice(text.removePrefix("{INF}"), '\n'))
+        listView.adapter = ArrayAdapter(root.context, android.R.layout.simple_list_item_1, slice(text.removePrefix("{101}"), '\n'))
 
         listView.setOnItemClickListener { parent, view, position, id ->
             Data.dialog = listView.adapter.getItem(position) as String

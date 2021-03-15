@@ -40,7 +40,7 @@ class GalleryFragment : Fragment() {
                 val reader = soc.getInputStream()
                 val data = ByteArray(255)
 
-                writer.write("add_friend".toByteArray())
+                writer.write("[SEND_REQ]".toByteArray())
                 Thread.sleep(50)
                 reader.read(data)
                 writer.write(Data.key.toByteArray())
@@ -51,7 +51,10 @@ class GalleryFragment : Fragment() {
                 reader.read(data)
 
                 val result = String(data)
-                SnakBar.make(view, result, Snackbar.LENGTH_LONG)
+                if(!result.startsWith("{100}"))
+                    SnakBar.make(view, result, Snackbar.LENGTH_LONG)
+                else
+                    Snackbar.make(view, "Request send!", Snackbar.LENGTH_LONG)
             }
         }
 

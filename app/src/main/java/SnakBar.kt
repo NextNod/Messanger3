@@ -3,28 +3,27 @@ import com.google.android.material.snackbar.Snackbar
 
 abstract class SnakBar {
     companion object {
-        fun make(view: View, code: String, length: Int) {
+        fun make(view: View, code: String, length: Int) : Boolean {
             val message =
                 when {
-                    code.startsWith("{110}") -> "Wrong password(("
-                    code.startsWith("{111}") -> "Wrong login(("
-                    code.startsWith("{200}") -> "Success!"
-                    code.startsWith("{210}") -> "That login is already have("
-                    code.startsWith("{211}") -> "That email is already have("
-                    code.startsWith("{400}") -> "Success!"
-                    code.startsWith("{410}") -> "Wrong user("
-                    code.startsWith("{501}") -> "You haven`t messages"
-                    code.startsWith("{700}") -> "Request sent"
-                    code.startsWith("{710}") -> "You`re already friends"
-                    code.startsWith("{711}") -> "The incoming request has already been sent"
-                    code.startsWith("{712}") -> "The outgoing request has already been sent"
-                    code.startsWith("{714}") -> "User not found"
-                    code.startsWith("{801}") -> "Users are already friends"
-                    code.startsWith("{901}") -> "Users are already friends"
-                    code.startsWith("{301}") -> "You don't have any friends"
-                    else -> "Some thing went wrong(("
+                    code.startsWith("{301}") -> "Wrong password!"
+                    code.startsWith("{302}") -> "Wrong login"
+                    code.startsWith("{303}") -> "Session is loosed"
+                    code.startsWith("{304}") -> "This username is already taken"
+                    code.startsWith("{305}") -> "This mail is already busy"
+                    code.startsWith("{306}") -> "Unknown user"
+                    code.startsWith("{307}") -> "You're already friends"
+                    code.startsWith("{308}") -> "The request is already received"
+                    code.startsWith("{309}") -> "The request is already sent"
+                    code.startsWith("{310}") -> "The request is no longer valid"
+                    else -> null
                 }
-            Snackbar.make(view, message, length).show()
+
+            if(message != null) {
+                Snackbar.make(view, message, length).show()
+            }
+
+            return message == null
         }
     }
 }

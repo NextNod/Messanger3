@@ -4,17 +4,33 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import java.lang.Exception
 
 class DataBase(context: Context, factory: SQLiteDatabase.CursorFactory?)
     : SQLiteOpenHelper(context, DATABASE_NAME, factory, DATABASE_VERSION){
     override fun onCreate(db: SQLiteDatabase) {
-        val CREATE_PRODUCTS_TABLE = ("CREATE TABLE " + TABLE_NAME + "(" + COLUMN_KEY + " TEXT)")
+        val CREATE_PRODUCTS_TABLE = ("CREATE TABLE $TABLE_NAME($COLUMN_KEY TEXT)")
         db.execSQL(CREATE_PRODUCTS_TABLE)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME)
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_NAME")
         onCreate(db)
+    }
+
+    fun haveDialog(name :String) :Boolean {
+        val db = readableDatabase
+        return try {
+            db.rawQuery("SELECT * FROM $name", null).close()
+            true
+        } catch (e :Exception) {
+            false
+        }
+    }
+
+    fun addDialog(name :String) {
+        val db = this.writableDatabase
+        db.execSQL("CREATE TABLE $name(ID INTEGER, author TEXT, text TEXT)")
     }
 
     fun addKey(key: String) {

@@ -28,6 +28,8 @@ class RequestFragment : Fragment() {
         val root = inflater.inflate(R.layout.fragment_request, container, false)
         val stateText = root.findViewById<TextView>(R.id.state_textView)
         var sourse :Array<String>? = null;
+        val listView = root.findViewById<ListView>(R.id.requestList)
+        val dialog = AlertDialog.Builder(root.context)
 
         val thread = Thread {
             val soc = Socket("nextrun.mykeenetic.by", 801)
@@ -35,16 +37,16 @@ class RequestFragment : Fragment() {
             val reader = soc.getInputStream()
             var data = ByteArray(255)
 
-            writer.write("check_requests".toByteArray())
+            writer.write("[GET_INC_REQ]".toByteArray())
             Thread.sleep(50)
             reader.read(data)
             writer.write(Data.key.toByteArray())
             Thread.sleep(50)
             reader.read(data)
 
-            if (String(data).startsWith("{800}")) {
+            if (String(data).startsWith("{101}")) {
                 data = clearData(data)
-                sourse = slice(String(data).removePrefix("{800}"), '\n')
+                sourse = slice(String(data).removePrefix("{101}"), '\n')
             }
             else {
                 stateText.text = "Sorry no requests(("
@@ -55,28 +57,38 @@ class RequestFragment : Fragment() {
 
         val layout = SwipeRefreshLayout(root.context)
         layout.setOnRefreshListener {
-            CoroutineScope(IO).launch {
+            val thread = Thread {
                 val soc = Socket("nextrun.mykeenetic.by", 801)
                 val writer = soc.getOutputStream()
                 val reader = soc.getInputStream()
                 var data = ByteArray(255)
 
-                writer.write("check_requests".toByteArray())
+                writer.write("[GET_INC_REQ]".toByteArray())
                 Thread.sleep(50)
                 reader.read(data)
                 writer.write(Data.key.toByteArray())
                 Thread.sleep(50)
                 reader.read(data)
 
-                if (String(data).startsWith("{800}")) {
+                if (String(data).startsWith("{100}")) {
                     data = clearData(data)
-                    sourse = slice(String(data).removePrefix("{800}"), '\n')
+                    sourse = slice(String(data).removePrefix("{100}"), '\n')
                 }
                 else {
                     stateText.text = "Sorry no requests(("
                 }
-                layout.isRefreshing = false
+
+                if(sourse != null) {
+                    stateText.visibility = View.INVISIBLE
+                    listView.visibility = View.VISIBLE
+                    root.findViewById<TextView>(R.id.textView6).visibility = View.VISIBLE
+                    listView.adapter = ArrayAdapter(root.context, android.R.layout.simple_list_item_1, sourse!!)
+                }
             }
+            thread.start()
+            thread.join()
+
+            layout.isRefreshing = false
         }
 
         layout.setColorSchemeResources(
@@ -85,9 +97,6 @@ class RequestFragment : Fragment() {
             android.R.color.holo_orange_light,
             android.R.color.holo_red_light
         )
-
-        val listView = root.findViewById<ListView>(R.id.requestList)
-        val dialog = AlertDialog.Builder(root.context)
 
         if(sourse != null) {
             stateText.visibility = View.INVISIBLE
@@ -108,7 +117,7 @@ class RequestFragment : Fragment() {
                         val reader = soc.getInputStream()
                         val data = ByteArray(255)
 
-                        writer.write("accept_request".toByteArray())
+                        writer.write("[ACCEPT_REQ]".toByteArray())
                         Thread.sleep(50)
                         reader.read(data)
 
@@ -121,10 +130,10 @@ class RequestFragment : Fragment() {
                         Thread.sleep(50)
                         reader.read(data)
 
-                        if(String(data).startsWith("{ER1}"))
-                            Snackbar.make(root, String(data).removePrefix("{ER1}"), Snackbar.LENGTH_LONG).show()
+                        if(String(data).startsWith("{100}"))
+                            Snackbar.make(root, "Now you`re friends!", Snackbar.LENGTH_LONG).show()
                         else {
-                            Snackbar.make(root, String(data).removePrefix("{INF}"), Snackbar.LENGTH_LONG).show()
+                            SnakBar.make(root, String(data), Snackbar.LENGTH_LONG)
                         }
                         dialog.cancel()
                     }
@@ -138,7 +147,7 @@ class RequestFragment : Fragment() {
                         val reader = soc.getInputStream()
                         val data = ByteArray(255)
 
-                        writer.write("decline_incoming".toByteArray())
+                        writer.write("[DENY_ICN_REQ]".toByteArray())
                         Thread.sleep(50)
                         reader.read(data)
 

@@ -67,7 +67,7 @@
         app:layout_constraintTop_toBottomOf="@+id/editTextRegisterPassword" />
 
     <CheckBox
-        android:id="@+id/checkBox"
+        android:id="@+id/checkBox_saveKey"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Remember me"
@@ -82,5 +82,5 @@
         android:onClick="onEnterRegister"
         app:layout_constraintEnd_toEndOf="@+id/editTextRegisterPassword"
         app:layout_constraintStart_toStartOf="@+id/editTextRegisterPassword"
-        app:layout_constraintTop_toBottomOf="@+id/checkBox" />
+        app:layout_constraintTop_toBottomOf="@+id/checkBox_saveKey" />
 </androidx.constraintlayout.widget.ConstraintLayout>

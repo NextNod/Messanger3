@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import android.widget.CheckBox
 import android.widget.EditText
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
@@ -35,7 +36,7 @@ class RegisterActivity : AppCompatActivity() {
             var data: ByteArray = ByteArray(255)
             val salt = genSalt()
 
-            writer.write("reg".toByteArray())
+            writer.write("[REG]".toByteArray())
             Thread.sleep(50)
             reader.read(data)
 
@@ -59,7 +60,7 @@ class RegisterActivity : AppCompatActivity() {
             reader.close()
             soc.close()
 
-            if (!String(data).startsWith("{200}"))
+            if (!String(data).startsWith("{100}"))
                 SnakBar.make(findViewById(R.id.button_register_enter), String(data), Snackbar.LENGTH_LONG)
             else {
                 val soc = Socket("nextrun.mykeenetic.by", 801)
@@ -67,7 +68,7 @@ class RegisterActivity : AppCompatActivity() {
                 val reader = soc.getInputStream()
                 data = ByteArray(255)
 
-                writer.write("log".toByteArray())
+                writer.write("[LOG]".toByteArray())
                 reader.read(data)
 
                 writer.write(login.toByteArray())
@@ -75,15 +76,28 @@ class RegisterActivity : AppCompatActivity() {
 
                 data = clearData(data)
 
-                writer.write(hashString(pass + String(data)).toByteArray())
+                writer.write(hashString(pass + String(data).removePrefix("{101}")).toByteArray())
                 Thread.sleep(100)
                 reader.read(data)
 
-                if (String(data).startsWith("{"))
-                    SnakBar.make(findViewById(R.id.button_register_enter), String(data), Snackbar.LENGTH_LONG)
-                else {
-                    Data.key = String(data).removeRange(9, 10)
-                    startActivity(Intent(applicationContext, HomeActivity::class.java))
+                val result = String(data)
+                if(!result.startsWith("{101}"))
+                    SnakBar.make(findViewById(R.id.button_register_enter), result, Snackbar.LENGTH_LONG)
+                else
+                {
+                    val intent = Intent(applicationContext, HomeActivity::class.java)
+
+                    if(findViewById<CheckBox>(R.id.checkBox_saveKey).isChecked) {
+                        val db = DataBase(applicationContext, null)
+                        if(!db.isEmpty())
+                            db.deleteKey()
+                        db.addKey(result.removePrefix("{101}").substring(0, 9))
+                        db.close()
+                    }
+
+                    Data.key = result.removePrefix("{101}").substring(0, 9)
+                    startActivity(intent)
+                    finish()
                 }
             }
         }
